@@ -1,0 +1,72 @@
+Solution: Assignment 1
+Do you trust the study? Why or why not?
+
+Code for the solution 
+sr = np.random.binomial(n=100, p=0.2, size=16) 
+fs = (u"Baden-Württemberg","Bayern","Berlin","Brandenburg","Bremen","Hamburg","Hessen"
+"Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen",
+"Rheinland-Pfalz","Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein",
+u"Thüringen")
+for s,f in zip(sr,fs):
+print "Percentage of infidelity in %s is %d%%"%(f,s)
+
+
+---
+To understand the problem better simulate i.i.d. binary trials:
+
+Terminology (more explanation during the practical session):
+- i.i.d.: independent and identically distributed
+- independent: the outcome of one observation does 
+not effect the outcome of another observation
+- identically distributed: for all events
+- Binary trial (Bernoulli trial): 
+- random variable X with two outcomes {0,1} 
+- p \in ]0,1[ is the parameter with 
+P(X=1) = p and 
+P(X=0) = 1-p = q
+
+A Binomial(n,p) random variable is the sum of n i.i.d. Bernoulli(p) random variables.
+e.g. 200 Binary trials with p = 0.2 in numpy can result in:
+IN >> np.random.binomial(n=100, p=0.2)
+OUT>> 41 
+So we have 41 positive (X=1) outcomes and 159 negative (X=0) outcomes. 
+
+Make 100 Binominal experiments (with fixed p=0.2 and n) and estimate p from 
+the outcomes of each experiment (by maximum likelihood) with n=10,100,1000,10000,100000,1000000.
+
+What is the (empirical) variance and the standard deviation of p for the different n?
+
+P% (P-value) confidence intervall: intervall in which P% of the estimates are expected to fall.
+In which intervall are 90% of the estimated p?
+
+Plot histograms of the distribution of p?
+
+def plot_hist(i, n, ps, fig):
+ax = fig.add_subplot(2,2,i+1)
+ax.set_title('n=%d'%n)
+ax.hist(ps, bins=np.arange(0.,0.5,0.01))
+
+
+#hist, bins = np.histogram(ps, bins=np.arange(0.,0.5,0.01))
+#print hist
+#width = 0.7 * (bins[1] - bins[0])
+#center = (bins[:-1] + bins[1:]) / 2
+#print center
+#print width
+#ax.bar(center, hist, align='center', width=width)
+
+import scipy.stats
+
+fig = plt.figure(1)
+size=1000
+for i in range(0,6):
+n = 10**(i+1)
+outcomes = np.random.binomial(n=n, p=0.2, size=size)
+ps = outcomes/float(n)
+print "n: ", n
+print "variance: ", np.var(ps, ddof=1)
+print "standard deviation: " , np.std(ps, ddof=1)
+print "range for 68.2%% of the p-values (%f, %f)"%( np.percentile(ps, 15.9), np.percentile(ps, 84.1))
+print "range for 95%% of the p-values: (%f, %f)\n"%( np.percentile(ps, 02.5), np.percentile(ps, 97.5)) 
+#print scipy.stats.mvsdist(ps, alpha=0.9)
+if i<4: plot_hist(i,n,ps,fig)

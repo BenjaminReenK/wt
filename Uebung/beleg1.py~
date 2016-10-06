@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# Author: Benjamin Kneer (s0546862), Frederik Dudzik (s0546859)
+
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.stats
+
+nValues = [10, 100, 1000, 10000]
+countTrials = 100
+
+def task4():
+    sr = np.random.binomial(n=100, p=0.2, size=16) 
+    fs = ("Baden-Württemberg","Bayern","Berlin","Brandenburg","Bremen","Hamburg","Hessen", "Mecklenburg-Vorpommern","Niedersachsen","Nordrhein-Westfalen", "Rheinland-Pfalz","Saarland","Sachsen","Sachsen-Anhalt","Schleswig-Holstein", "Thüringen")
+
+    for s,f in zip(sr,fs):
+        print "Percentage of infidelity in %s is %d%%"%(f,s)
+    print "-----------------------------------------------------------"
+
+# http://stackoverflow.com/questions/15033511/compute-a-confidence-interval-from-sample-data
+# st.norm.interval liefert bei kleinen n's falsche wert
+def mean_confidence_interval(data, confidence=0.95):
+    a = 1.0*np.array(data)
+    n = len(a)
+    m, se = np.mean(a), scipy.stats.sem(a)
+    h = se * scipy.stats.t._ppf((1+confidence)/2., n-1)
+    return m, m-h, m+h
+
+def plot_hist(i, n, ps, fig):
+    ax = fig.add_subplot(2,2,i+1)
+    ax.set_title('n = %d'%n)
+    ax.hist(ps)
+
+def trials(n, p, count):
+    result = np.random.binomial(n, p, size=count)
+    #result = []
+    #for i in range(0, count):
+    #    result.append(np.random.binomial(n, p))
+    return result
+
+
+fig = plt.figure(1)
+i = 0
+
+for n in nValues:
+    # get rdm values using binary trials
+    outcomes = trials(n, 0.2, countTrials)
+    # get confidence interval
+    ci = mean_confidence_interval(outcomes)
+    # calculate standard variance
+    variance = n*0.2*(1-0.2)
+    # calculate estimated value
+    estimatedValue = 0.2 * n
+
+    # output
+    print "n: ", n
+    print "standard variance: ", variance / n
+    print "variance: ", np.var(outcomes) / n
+    print "standard deviation :", np.std(outcomes) / n
+    print "arithmetic mean : ", ci[0] / n
+    print "estimated value: ", estimatedValue / n
+    print "Confidence Interval: " + str(ci[1] / n) + " - " + str(ci[2] / n)
+    print "-----------------------------------------------------------"
+ 
+    plot_hist(i,n,outcomes,fig)
+    i += 1
+
+task4()
+plt.show()
